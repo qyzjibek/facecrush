@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import axios from 'axios';
+import React, { useDebugValue, useEffect, useState } from 'react'
 // import TinderCard from '../react-tinder-card/index'
 import TinderCard from 'react-tinder-card'
 
@@ -32,13 +33,21 @@ const db = [
 
 function Simple () {
   const characters = db
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    axios.get("https://facecrush-back.herokuapp.com/api/get-users").then((res) => {
+      setUsers(res.data);
+    })
+  }, [])
+
   const [lastDirection, setLastDirection] = useState()
 
   const swiped = (direction, nameToDelete) => {
-    if(direction == "right") {
-      db.find(person => person.name == nameToDelete).numberOfFans += 1;
-    }
-    console.log(db);
+    // if(direction == "right") {
+    //   db.find(person => person.name == nameToDelete).numberOfFans += 1;
+    // }
     setLastDirection(direction)
   }
 
@@ -52,10 +61,11 @@ function Simple () {
       <link href='https://fonts.googleapis.com/css?family=Alatsi&display=swap' rel='stylesheet' />
       <h1>Swipe right if you like the person below</h1>
       <div className='cardContainer'>
-        {characters.map((character) =>
-          <TinderCard className='swipe' key={character.name} onSwipe={(dir) => swiped(dir, character.name)} onCardLeftScreen={() => outOfFrame(character.name)}>
-            <div style={{ backgroundImage: 'url(' + character.url + ')' }} className='card'>
-              <h3 >{character.name}</h3>
+        {users.map((user) =>
+          <TinderCard className='swipe' key={user.username} onSwipe={(dir) => swiped(dir, user.username)} onCardLeftScreen={() => outOfFrame(user.username)}>
+            <div style={{ backgroundImage: 'url(' + "https://cdn.discordapp.com/avatars/666931849641328640/79a0547f474396f2e052972bff0cd7a3.webp?size=64"+ ')' }} className='card'>
+              <h3>{user.username}</h3>
+              {/* <h3> Fans: {user.likedUsers.length}</h3> */}
             </div>
           </TinderCard>
         )}
